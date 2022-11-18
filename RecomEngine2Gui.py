@@ -7,7 +7,6 @@ Created on Sun Nov 13 11:01:52 2022
 """
 
 from tkinter import *
-import recomendation_engine as re
 from PIL import ImageTk, Image
 from tkinter import messagebox
 import urllib.request
@@ -29,7 +28,7 @@ def selecitonWindow(results_df):
     for i in movie_ids:
 
         # Get row
-        movie_item = re.df.loc[(re.df['imdbId'] == i)]
+        movie_item = hal.df1.loc[(hal.df1['imdbId'] == i)]
 
         year = movie_item['Year'].to_list()[0]
 
@@ -46,7 +45,7 @@ def selecitonWindow(results_df):
         row_num += 1
         Radiobutton(selection_window, text=str(index) + ". " + str(title), variable=choice, value=int(index)).pack(anchor=W)
         # End method if number of results has been reached
-        if row_num == re.K:
+        if row_num == hal.K:
             break
     def clicked(value):
         global button1_bool
