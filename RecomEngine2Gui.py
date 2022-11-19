@@ -148,7 +148,7 @@ def Button4():
     return    
     
 root = Tk()  
-root.title("Recomemndataion Engine")    
+root.title("Recommendation Engine")    
 hal = RE2.Engine()
 frame1 = LabelFrame(root, text='Search Options', padx=20, pady=20)
 frame1.pack(padx=5, pady=5)

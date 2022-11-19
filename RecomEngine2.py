@@ -10,6 +10,8 @@ import numpy as np
 from imdb import IMDb
 from io import StringIO
 import Levenshtein
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 def format_year(x):
@@ -127,7 +129,30 @@ class Engine:
             lambda x: self.euclidean_distance(base_case[comparison_type], x))
 
     def calculate_cosine(self):
-        return
+       # list to store all the plots
+        plots = []
+        # get my selected movie
+        base_case_df = self.df2[self.df2['imdb_id']==self.selection]
+        # filter the plots to the ones in our cluster
+        compare_df = self.df2[self.df2['imdb_id'].isin(self.df_cluster['imdbId'])]
+        # add all the plots to a list
+        for i , row in base_case_df.iterrows():
+            movie_plot = row['overview']
+            plots.append(movie_plot)
+
+        for i, row in compare_df.iterrows():
+            movie_plot = row['overview']
+            plots.append(movie_plot)
+
+        plots = tuple(plots)
+
+        tfidf_vectorizer = TfidfVectorizer()
+        tfidf_matrix = tfidf_vectorizer.fit_transform(plots)
+
+        results = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix)
+
+        self.df_cluster['cosine_similarity'] = results.tolist()
+        
 
     def filter_and_sort(self, weight_title, weight_plot, weight_year):
         #self.df_cluster['score'] = 0
