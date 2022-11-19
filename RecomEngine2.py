@@ -151,7 +151,7 @@ class Engine:
 
         results = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix)
 
-        self.df_cluster['cosine_similarity'] = results.tolist()
+        self.df_cluster['cosine_similarity'] = results
         
 
     def filter_and_sort(self, weight_title, weight_plot, weight_year):
