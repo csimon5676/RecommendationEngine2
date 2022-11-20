@@ -16,6 +16,46 @@ import requests
 from io import BytesIO
 import RecomEngine2 as RE2
 
+def displayMovies(results_df, limit_rows, title_display, rating_bool):
+    # Pull out the movie ids
+    display_window = Toplevel()
+    display_window.title(title_display)
+    display_window.geometry('700x250')
+
+    movie_ids = results_df['imdbId'].to_list()
+    
+    row_num = 0
+    index = 0
+
+    # Get movies from original dataframe
+    for i in movie_ids:
+
+        # Get row
+        movie_item = hal.df_cluster[(hal.df_cluster['imdbId'] == i)]
+
+        # Get more movie data from imdb
+        if(rating_bool):
+            movie = hal.ia.get_movie(movie_item['imdbId'].to_list()[0])
+            rating = movie.get('rating')
+            link = movie.get('cover url')
+            
+        title = movie_item['title'].to_list()[0]
+        print_selection=''
+        index +=1
+        if(rating_bool):
+            print_selection +=str(index)+'. ' + str(title)+' rating: ' + str(rating)
+        else:
+            print_selection +=str(index)+'. ' + str(title)
+        search_options = Label(display_window,text = print_selection).pack()
+        
+
+        # Count number of results
+        if limit_rows:
+            row_num += 1
+
+        # End method if number of results has been reached
+        if row_num == 10:
+            return  
 def selecitonWindow(results_df):
     selection_window = Toplevel()
     selection_window.title("Search Results")
@@ -45,7 +85,7 @@ def selecitonWindow(results_df):
         row_num += 1
         Radiobutton(selection_window, text=str(index) + ". " + str(title), variable=choice, value=int(index)).pack(anchor=W)
         # End method if number of results has been reached
-        if row_num == hal.K:
+        if row_num == 10:
             break
     def clicked(value):
         global button1_bool
@@ -90,8 +130,8 @@ def Button2():
         messagebox.showerror("Error", "K must be int >=2!")
         return
   
-    hal.set_K(K_entry.get())
-    k_label = Label(frame2, text ='K is'+ hal.get_K()).pack()
+    hal.set_K(user_input)
+    k_label = Label(frame2, text ='K is '+ str(hal.get_K())).pack()
     
 def Button3(value):
     global button4
@@ -119,13 +159,23 @@ def Button4():
             #filter function
             print('Filtering')
             
-# =============================================================================
-#             try:
-#                 hal.filter_and_sort(float(weight_title.get()), float(weight_plot.get()), float(weight_year.get()))
-#             except:
-#                 messagebox.showerror("Weights must be numbers!")
-# =============================================================================
-            #hal.filter_and_sort(weight_title.get(), weight_plot.get(), weight_year.get())
+            try:
+                if(weight_title.get()):
+                    title_weight = float(weight_title.get())
+                    print(title_weight)
+                    hal.title_weight=title_weight
+                if(weight_plot.get()):
+                    plot_weight = float(weight_plot.get())
+                    print(plot_weight)
+                    hal.plot_weight = plot_weight
+                if(weight_year.get()):
+                    year_weight =float(weight_year.get())
+                    print(year_weight)
+                    hal.a_year_weight = year_weight
+            except:
+                messagebox.showerror("Weights must be numbers!")
+            movie_recommendations = hal.filter_and_sort()
+            displayMovies(movie_recommendations, True, 'Your Recommendations', False)
     filter_window = Toplevel()
     filter_window.title('Filter Parameters')
     filter_instructions = Label(filter_window, text='Select filtering parameter(s) and add weights for cluster').pack()
@@ -148,7 +198,7 @@ def Button4():
     return    
     
 root = Tk()  
-root.title("Recommendation Engine")    
+root.title("Recomemndataion Engine")    
 hal = RE2.Engine()
 frame1 = LabelFrame(root, text='Search Options', padx=20, pady=20)
 frame1.pack(padx=5, pady=5)
@@ -183,8 +233,6 @@ button4.pack()
 button4_exp = Label(frame2, text ='Cluster will become available after searching\n and selecting a movie and choosing parameters.').pack()
 
 
-l = hal.df1
-q = hal.df2
-
 
 root.mainloop()
+
