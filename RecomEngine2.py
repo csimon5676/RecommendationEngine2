@@ -38,7 +38,7 @@ def format_id(x):
             return int(x)
 class Engine:
     def __init__(self):
-        self.ia = IMDb()
+        #self.ia = IMDb()
         self.K = 10
         self.cluster_param = 2 #0 genre 1 title 2 genre and title
         self.filter_title = False
